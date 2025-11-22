@@ -20,7 +20,7 @@ Objective for this project was to create a scalable ELT pipeline to turn raw EEG
 Used `mne` to ingest polysomnograph (PSG) files and hynogram annotations from the Sleep-EDF database. 
 - Signal Processing: Transformed raw EEG signals from time to frequency domains using Power Spectral Density (PSD) calculations.
 - Optimization: The `preload` parameter is currently set to `True` for EDF extraction. This saves the loaded EDF data to RAM for faster FFT and matrix math calculation,
-  but there is risk of memory depletion.
+  but there is risk of memory depletion with larger batches.
 - Standardization: mapped MNE integer labels to clinical stages (`W`, `N1`, `N2`, `N3`, `REM`) before exporting.
 
 The sleep stage annotations and band powers for each epoch are then saved to a .csv for warehousing.
@@ -34,7 +34,7 @@ Built a Directed Acyclic Graph (DAG):
 - Staging
   - Standardized column naming and explicit type casting
 - Intermediate
-  - Used window functions to calculate rolling power averages, for smoothing deviations and artifacts.
+  - Used window functions to calculate rolling power averages over five sliding epochs, for smoothing deviations and artifacts.
   - Used `LAG()` function to detect transitions in sleep stage.
 - Sleep Summary
   - Compressed epoch rows into a single patient summary table.
