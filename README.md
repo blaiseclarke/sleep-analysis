@@ -23,7 +23,7 @@ Used `mne` to ingest polysomnograph (PSG) files and hynogram annotations from th
   but there is risk of memory depletion.
 - Standardization: mapped MNE integer labels to clinical stages (`W`, `N1`, `N2`, `N3`, `REM`) before exporting.
 
-The EEG signal, sleep stage annotations, and band powers are then saved to a .csv for warehousing.
+The sleep stage annotations and band powers for each epoch are then saved to a .csv for warehousing.
 
 ### Warehousing (Snowflake)
 Loaded epoched extraction data into Snowflake.
