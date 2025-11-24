@@ -37,7 +37,7 @@ Built a Directed Acyclic Graph (DAG):
   - Used `LAG()` function to detect transitions in sleep stage.
 - Sleep Summary
   - Compressed epoch rows into a single patient summary table.
-  - Calculated sleep architecture (deep/light/REM percentages) and sleep quality (delta and sigma power averages).
+  - Calculated sleep architecture (deep/light/REM percentages) and average power across the entire recording.
 
 ### QC and Testing
 Implemented schema tests to ensure reliability and quality.
