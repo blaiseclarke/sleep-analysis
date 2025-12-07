@@ -7,13 +7,6 @@ Objective for this project was to create a scalable ELT pipeline to turn raw EEG
 ### Architecture
 <img width="1270" height="269" alt="Screenshot 2025-11-22 at 8 06 29 AM" src="https://github.com/user-attachments/assets/5ecabb9a-6b37-460e-9959-8b0dbab518a9" />
 
-### Engineering
-This pipeline was upgraded from a script-based workflow to a production-grade data system:
-* **Orchestration (Prefect):** Python extraction logic wrapped in a Prefect flow, providing structured logging and retries for failed tasks.
-* **Data Contracts (Pydantic):** Developed strict schema to validate every epoch before ingestion occurs.
-* **Automated Testing (Pytest):** Unit tests to validate ingestion logic and constraints.
-* **CI/CD (Github Actions):** Test suite is triggered on every push.
-
 **Source:** [PhysioNet Sleep-EDF Database](https://www.physionet.org/content/sleep-edfx/1.0.0/) (ingestion)
 
 **Extraction:** Python (signal processing and feature extraction)
@@ -21,6 +14,13 @@ This pipeline was upgraded from a script-based workflow to a production-grade da
 **Warehousing:** Snowflake (storage and computing)
 
 **Transformation:** dbt (modeling and testing)
+
+### Engineering
+This pipeline was upgraded from a script-based workflow to a production-grade data system:
+* **Orchestration (Prefect):** Python extraction logic wrapped in a Prefect flow, providing structured logging and retries for failed tasks.
+* **Data Contracts (Pydantic):** Developed strict schema to validate every epoch before ingestion occurs.
+* **Automated Testing (Pytest):** Unit tests to validate ingestion logic and constraints.
+* **CI/CD (Github Actions):** Test suite is triggered on every push.
 
 ### Extraction (Python/MNE)
 Used `mne` to ingest polysomnograph (PSG) files and hynogram annotations from the Sleep-EDF database. 
