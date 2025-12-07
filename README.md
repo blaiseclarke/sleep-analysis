@@ -46,10 +46,10 @@ Built a Directed Acyclic Graph (DAG):
   - Compressed epoch rows into a single patient summary table.
   - Calculated sleep architecture (deep/light/REM percentages) and average power across the entire recording.
 
-### QC and Testing
-Implemented schema tests to ensure reliability and quality.
-- Unique values for `epoch_id` surrogate key.
-- Accepted values for sleep stages.
+### Data Integrity (dbt)
+Implemented schema tests in dbt to ensure quality after loading data.
+- Unique and not-null tests for `epoch_id` to prevent duplication.
+- Accepted values for sleep stages to ensure consistency with Pydantic constraints.
 
 ### Results
 Processed batch of single ~24-hour recordings from 10 subjects from the PhysioNet Sleep-EDF database.
