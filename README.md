@@ -56,6 +56,7 @@ Features extracted:
 
 ### Warehousing (Snowflake)
 Loaded epoched extraction CSV data into Snowflake
+
 Allows for the pipeline to scale without a need for refactoring or local compute
 
 ### Transformation (dbt)
