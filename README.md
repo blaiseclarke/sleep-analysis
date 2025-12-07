@@ -1,5 +1,5 @@
 ## Sleep-EDF Analytics Pipeline
-### Python, Prefect, MNE-Python, Pydantic, Snowflake, dbt, SQL
+#### Python, Prefect, MNE-Python, Pydantic, Snowflake, dbt, SQL
 
 Clinical data is usually trapped in raw, heavy file formats like EDF (European Data Format), which can be difficult to query at scale. 
 Objective for this project was to create a scalable ELT pipeline to turn raw EEG signals into clinical insights ready for use in downstream analysis.
