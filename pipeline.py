@@ -6,7 +6,7 @@ from pydantic import ValidationError
 
 @task(retries=2, retry_delay_seconds=10)
 def extract_subject_data(subject_id: int) -> pd.DataFrame:
-    logger = get_run_logger
+    logger = get_run_logger()
     logger.info(f"Starting extraction for subject {subject_id}")
 
     df = process_subject(subject_id)
@@ -35,7 +35,7 @@ def validate_data(df: pd.DataFrame) -> pd.DataFrame:
     for record in records:
         try:
             valid_record = SleepEpoch(**record)
-            valid_record.append(valid_record.model_dump())
+            valid_records.append(valid_record.model_dump())
         except ValidationError as e:
             logger.error(f"Validation failed for epoch {record.get('epoch_idx')}: {e}")
             continue
