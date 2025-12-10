@@ -2,6 +2,7 @@
 #### Python, Prefect, MNE-Python, Pydantic, Snowflake, dbt, SQL
 
 Converts raw Sleep-EDF EEG recordings into sleep-epoch metrics and summary statistics.
+
 Python extracts and cleans -> Snowflake storage -> dbt models create clinical insights
 
 
@@ -27,6 +28,8 @@ This pipeline was upgraded from a script-based workflow to a production-grade da
 * **Automated Testing (Pytest):** Unit tests to validate ingestion logic and constraints.
 * **CI/CD (Github Actions):** Test suite is triggered on every push.
 
+<img width="986" height="497" alt="Screenshot 2025-12-09 at 10 57 55 PM" src="https://github.com/user-attachments/assets/71dabb27-486a-4b49-9dce-5d615d02172a" />
+
 ### Quick Start
 ```bash
 # Extract raw EDF to CSV
@@ -51,8 +54,8 @@ Built using `mne` for polysomnograph (PSG) ingestion and annotation alignment.
 Features extracted:
 - Power spectral density -> delta, theta, alpha, sigma, beta bands
 - Labels mapped to standardized sleep stages: `W, N1, N2, N3, REM, MOVE, NAN`
-- ~30-second epochs, ~24 hours per subject
-- Current note: `preload=True` speeds up FFT, but increases memory usage. May require batching for large datasets.
+- Configurable epochs, ~24 hours per subject
+- *Current note:* `preload=True` speeds up FFT, but increases memory usage. May require batching for large datasets.
 
 ### Warehousing (Snowflake)
 Loaded epoched extraction CSV data into Snowflake
