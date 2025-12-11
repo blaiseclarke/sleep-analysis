@@ -48,11 +48,13 @@ pip install -r requirements.txt
 # Run ingestion pipeline
 python3 pipeline.py
 
-# Manual step: upload to Snowflake
-# 1. Create a database called EEG_ANALYTICS
-# 2. Create a schema named RAW
-# 3. Upload sleep_data_validated.csv into the schema
-# 4. Name the table SLEEP_EPOCHS so dbt can find it
+# Create a .env file in root directory and add your Snowflake details:
+# SNOWFLAKE_USER=your_user
+# SNOWFLAKE_PASSWORD=your_password
+# SNOWFLAKE_ACCOUNT=your_account_identifier
+# SNOWFLAKE_WAREHOUSE=COMPUTE_WH
+# SNOWFLAKE_DATABASE=EEG_ANALYTICS
+# SNOWFLAKE_SCHEMA=RAW
 
 # Execute warehouse transformations
 dbt deps
