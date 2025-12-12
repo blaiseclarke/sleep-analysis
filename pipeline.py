@@ -90,7 +90,7 @@ def load_to_snowflake(df, table_name="SLEEP_EPOCHS"):
             account=account,
             warehouse=warehouse,
             database=database,
-            schema=schema
+            schema=schema,
         )
 
         logger.info(f"Uploading {len(df)} rows to {database}.{schema}.{table_name}...")
@@ -100,7 +100,7 @@ def load_to_snowflake(df, table_name="SLEEP_EPOCHS"):
             df, 
             table_name.upper(), 
             auto_create_table=True,
-            overwrite=False          # Set to True if you want to replace data every run
+            overwrite=True          # Set to True if you want to replace data every run
         )
         
         if success:

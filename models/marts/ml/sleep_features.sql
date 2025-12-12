@@ -13,7 +13,6 @@ with
     ),
 
     -- Normalize power ratios per subject
-
     normalized as (
         select
         epoch_id,

@@ -5,7 +5,7 @@ from mne.datasets.sleep_physionet.age import fetch_data
 
 # Configuration
 STARTING_SUBJECT = 0
-ENDING_SUBJECT = 9
+ENDING_SUBJECT = 24
 RECORDING = 1  
 EPOCH_LENGTH = 30.0  # seconds
 
