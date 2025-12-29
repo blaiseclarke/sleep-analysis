@@ -143,8 +143,8 @@ Data is loaded into Snowflake to separate compute from storage. This allows the 
 #### 3. Transformation (dbt)
 The dbt project creates a trusted data lineage, transforming raw logs into analytics-ready models:
 
-* **Staging (`stg_sleep_data`):** Handles column standardization and explicit type casting.
-* **Intermediate (`int_power_rolling`):** Calculates rolling power averages over sliding epochs to smooth out signal artifacts and deviations.
+* **Staging (`staging_sleep_data`):** Handles column standardization and explicit type casting.
+* **Intermediate (`sleep_metrics`):** Calculates rolling power averages over sliding epochs to smooth out signal artifacts and deviations.
 * **Marts (`sleep_summary`):** Aggregates data into clinical insights:
     * Sleep Architecture (Deep vs. Light vs. REM %)
     * Awakening counts
