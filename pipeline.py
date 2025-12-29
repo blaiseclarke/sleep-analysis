@@ -1,12 +1,14 @@
 import os
+import traceback
 import pandas as pd
-import snowflake.connector
+import pandera as pa
+from typing import Optional
 from dotenv import load_dotenv
-from prefect import task, flow, get_run_logger
-from snowflake.connector.pandas_tools import write_pandas
-from ingest_data import process_subject, STARTING_SUBJECT, ENDING_SUBJECT
-from schemas import SleepEpoch
-from pydantic import ValidationError
+from prefect import task, flow, get_run_logger, unmapped
+from ingest_data import process_subject as extract_logic, STARTING_SUBJECT, ENDING_SUBJECT
+from warehouse.duckdb_client import DuckDBClient
+from validators import SleepSchema
+from prefect.task_runners import ConcurrentTaskRunner
 
 # Loading environment variables
 load_dotenv()
@@ -16,17 +18,11 @@ load_dotenv()
 def extract_subject_data(subject_id: int) -> pd.DataFrame:
     """
     Locates and extracts subject data from the local EDF files.
-
-    Handles signal processing using MNE-Python, channel renaming, and bandpass
-    filtering.
-
-    :param subject_id: subject ID for the file.
-    :return DataFrame to be sent to Pydantic for validation, then ingestion.
     """
     logger = get_run_logger()
     logger.info(f"Starting extraction for subject {subject_id}")
 
-    df = process_subject(subject_id)
+    df = extract_logic(subject_id)
 
     if df is None or df.empty:
         logger.warning(f"No data was returned for subject {subject_id}")
@@ -36,107 +32,84 @@ def extract_subject_data(subject_id: int) -> pd.DataFrame:
 
 
 @task
-def validate_data(df: pd.DataFrame) -> pd.DataFrame:
+def validate_data(df: pd.DataFrame, subject_id: int, warehouse_client: DuckDBClient) -> Optional[pd.DataFrame]:
     """
-    Validates raw DataFrame records against the Pydantic SleepEpoch constraints.
-
-    Iterates through records, catching validation errors, and logging them
-    as warnings.
-
-    :param df: DataFrame containing band power data for a batch of epochs.
-    :return: DataFrame containing records that have passed validation.
+    Validates raw DataFrame records against the Pandera SleepSchema.
     """
-
     logger = get_run_logger()
-    records = df.to_dict(orient="records")
-    valid_records = []
-
-    for record in records:
-        try:
-            valid_record = SleepEpoch(**record)
-            valid_records.append(valid_record.model_dump())
-        except ValidationError as e:
-            logger.error(f"Validation failed for epoch {record.get('epoch_idx')}: {e}")
-            continue
-
-    return pd.DataFrame(valid_records)
+    
+    try:
+        return SleepSchema.validate(df, lazy=True)
+    except pa.errors.SchemaErrors as e:
+        error_msg = f"Validation failed for subject {subject_id}: {str(e)}"
+        logger.error(error_msg)
+        warehouse_client.log_ingestion_error(
+            subject_id=subject_id,
+            error_type="SchemaErrors",
+            error_message=str(e),
+            stack_trace=traceback.format_exc()
+        )
+        return None
 
 
 @task
-def load_subject_to_snowflake(df, subject_id, table_name="SLEEP_EPOCHS"):
+def process_subject(subject_id: int, warehouse_client: DuckDBClient) -> Optional[pd.DataFrame]:
     """
-    Loads a pandas DataFrame directly into Snowflake.
+    Composite task to handle extraction and validation for a single subject.
+    """
+    raw_df = extract_subject_data(subject_id)
+    
+    if raw_df is None or raw_df.empty:
+        return None
+        
+    return validate_data(raw_df, subject_id, warehouse_client)
 
-    This function handles the connection and makes sure the connection is closed
-    even if the upload fails.
+
+@task
+def load_to_warehouse(client: DuckDBClient, df: pd.DataFrame, subject_id: int):
+    """
+    Persists subject data to the configured warehouse.
     """
     logger = get_run_logger()
-
-    # Get credentials from environment variables
-    user = os.getenv("SNOWFLAKE_USER")
-    password = os.getenv("SNOWFLAKE_PASSWORD")
-    account = os.getenv("SNOWFLAKE_ACCOUNT")
-    warehouse = os.getenv("SNOWFLAKE_WAREHOUSE")
-    database = os.getenv("SNOWFLAKE_DATABASE")
-    schema = os.getenv("SNOWFLAKE_SCHEMA")
-
-    if not all([user, password, account, warehouse, database, schema]):
-        raise ValueError("Missing Snowflake environment variables")
-
-    logger.info(f"Connecting to Snowflake account {account}...")
-
-    # Establish connection
-    conn = snowflake.connector.connect(
-        user=user,
-        password=password,
-        account=account,
-        warehouse=warehouse,
-        database=database,
-        schema=schema,
-    )
-
-    try:
-        cursor = conn.cursor()
-        try:
-            delete_query = f"DELETE FROM {table_name} WHERE SUBJECT_ID = {subject_id}"
-            logger.info(f"Clearing existing data for Subject {subject_id}...")
-            cursor.execute(delete_query)
-        except Exception as e:
-            logger.warning(f"Could not clear data: {e}")
-
-        success, n_chunks, n_rows, _ = write_pandas(
-            conn, df, table_name.upper(), auto_create_table=True, overwrite=False
-        )
-
-        if success:
-            logger.info(f"Subject {subject_id}: Loaded {n_rows} rows.")
-        else:
-            raise Exception("Snowflake upload failed.")
-    finally:
-        conn.close()
+    logger.info(f"Loading data for subject {subject_id} to warehouse...")
+    client.load_epochs(df, subject_id)
 
 
-@flow(name="Sleep-EDF Ingestion Pipeline")
+@flow(name="Sleep-EDF Ingestion Pipeline", task_runner=ConcurrentTaskRunner(max_workers=3))
 def run_ingestion_pipeline():
     """
-    Executes the ingestion pipeline as the Prefect starting point.
-
-    Orchestrates extraction, validation, and loading tasks across all
-    subject files.
+    Executes the ingestion pipeline using Prefect mapping for parallelization.
     """
     logger = get_run_logger()
+    warehouse_client = DuckDBClient()
 
-    # Iterate through subject recordings
-    for subject_id in range(STARTING_SUBJECT, ENDING_SUBJECT + 1):
-        raw_df = extract_subject_data(subject_id)
+    subject_ids = list(range(STARTING_SUBJECT, ENDING_SUBJECT + 1))
 
-        if raw_df.empty:
-            continue
+    # Step 3 & 4: Use mapping for parallel extraction and validation
+    processed_results = process_subject.map(subject_ids, unmapped(warehouse_client))
 
-        clean_df = validate_data(raw_df)
+    # Serialized loading to avoid DuckDB locking
+    for subject_id, result_future in zip(subject_ids, processed_results):
+        try:
+            clean_df = result_future.result()
+            
+            if clean_df is not None:
+                # Ensure columns are uppercase to match warehouse schema
+                clean_df.columns = [c.upper() for c in clean_df.columns]
+                load_to_warehouse(warehouse_client, clean_df, subject_id)
+            else:
+                logger.warning(f"Skipping load for subject {subject_id} due to previous failures.")
 
-        clean_df.columns = [c.upper() for c in clean_df.columns]
-        load_subject_to_snowflake(clean_df, subject_id)
+        except Exception as e:
+            error_msg = f"Critical failure in load loop for subject {subject_id}: {str(e)}"
+            logger.error(error_msg)
+            warehouse_client.log_ingestion_error(
+                subject_id=subject_id,
+                error_type=type(e).__name__,
+                error_message=str(e),
+                stack_trace=traceback.format_exc()
+            )
+
 
     logger.info("Pipeline finished!")
 

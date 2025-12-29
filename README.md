@@ -22,8 +22,9 @@ This project is an end-to-end ELT pipeline that transforms raw physiological sig
 | :--- | :--- | :--- |
 | **Source** | **PhysioNet** | Sleep-EDF Database (Raw .edf files) |
 | **Ingestion** | **Python + MNE** | Signal processing, FFT, and feature extraction |
-| **Orchestration** | **Prefect** | Flow management, retries, and observability |
-| **Warehousing** | **Snowflake** | Scalable cloud storage for raw and modeled data |
+| **Validation** | **Pandera** | Schema-level validation and error logging |
+| **Orchestration** | **Prefect** | Parallel mapping and flow management |
+| **Warehousing** | **DuckDB / Snowflake** | Portable storage for raw and modeled data |
 | **Transformation** | **dbt** | SQL-based modeling for clinical insights |
 | **Runtime** | **Docker** | Reproducible environment for ingestion and orchestration |
 
@@ -31,12 +32,13 @@ This project is an end-to-end ELT pipeline that transforms raw physiological sig
 
 ### Engineering Highlights
 
-* **🛡 Data Contracts (Pydantic):** Defined strict schemas to validate every epoch before ingestion. If a signal doesn't match the schema, the pipeline fails gracefully before corrupting the warehouse.
-* **✨ Fast Linting (Ruff):** Integrated `ruff` for near-instant linting and code formatting, maintaining high code quality.
-* **⚡ Automated CI:** GitHub Actions triggers the `pytest` suite and `ruff` checks on every push, ensuring no regressions.
-* **🛠 Makefile Automation:** Simplified local development with a comprehensive `Makefile` for one-command installs, tests, and runs.
-* **🧪 Data Integrity Tests:** Custom dbt tests ensure logical consistency (e.g., *Band power must be positive*, *Sleep stages must be standard clinical codes*)
-* **🔄 Observability:** Prefect dashboard provides real-time logging and monitoring for all pipeline tasks.
+* **🛡 Data Contracts (Pandera):** Transitioned to `pandera` for high-performance schema validation of large DataFrames.
+* **🚀 Parallel Execution:** Leveraged Prefect Mapping to process subject signal extractions concurrently.
+* **💾 Local Warehousing (DuckDB):** Implemented DuckDB for fast, local persistent storage, enabling development without a Snowflake trial.
+* **✨ Fast Linting (Ruff):** Integrated `ruff` for near-instant linting and code formatting.
+* **⚡ Automated CI:** GitHub Actions triggers the `pytest` suite and `ruff` checks on every push.
+* **🛠 Makefile Automation:** Simplified local development with a comprehensive `Makefile` for one-command installs and runs.
+* **🧪 Data Integrity Tests:** Custom dbt tests ensure logical consistency (e.g., *Band power must be positive*).
 
 <img width="986" alt="Prefect Dashboard" src="https://github.com/user-attachments/assets/71dabb27-486a-4b49-9dce-5d615d02172a" />
 
@@ -92,24 +94,19 @@ The recommended way for local development and testing.
 git clone https://github.com/blaiseclarke/sleep-edf-data-pipeline.git
 cd sleep-edf-data-pipeline
 
-# 2. Setup and Install
+# 2. Setup and install
 make install
 
-# 3. Configure environment variables (or use .env file)
-export SNOWFLAKE_USER=your_user
-export SNOWFLAKE_PASSWORD=your_password
-# ... other vars as listed in Option 1
+# 3. Initialize local database
+python scripts/setup_db.py
 
-# 4. Run, Lint, and Test
+# 4. Run, lint, and Test
 make lint    # Check for errors
 make format  # Autoformat code
-make test    # Run unit tests
-make run     # Run ingestion pipeline
+make run     # Run parallel ingestion pipeline (persists to DuckDB)
 
 # 5. Transformations
-dbt deps --profiles-dir .
-dbt run --profiles-dir .
-dbt test --profiles-dir .
+# (Requires dbt-duckdb or Snowflake setup)
 ```
 
 #### Option 3: Manual Python Execution
@@ -157,9 +154,9 @@ The dbt project creates a trusted data lineage, transforming raw logs into analy
 
 #### 4. Data Integrity (Testing)
 Reliability is enforced through a suite of automated tests:
-* **Uniqueness:** `epoch_id` checked to prevent duplication.
-* **Constraints:** Sleep stages validated against accepted values defined in Pydantic.
-* **Logic:** Band powers must be positive floats; `not null` checks on IDs and spectral metrics.
+* **Uniqueness:** Unique IDs checked to prevent duplication.
+* **Constraints:** Sleep stages validated against accepted values defined in Pandera.
+* **Logic:** Band powers must be positive floats; `not null` checks on spectral metrics.
 
 ---
 
