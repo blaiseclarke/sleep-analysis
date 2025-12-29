@@ -8,10 +8,10 @@
 ![CI](https://img.shields.io/badge/GitHub_Actions-CI-2088FF?logo=github-actions&logoColor=white)
 
 ### Project Overview
-This project is an end-to-end ELT pipeline that transforms raw physiological signal data (Sleep-EDF) into queryable sleep metrics. It replaces manual, script-based workflows with a modern data stack, enabling scalable query performance, automated data quality checks, and reliable warehousing.
+This project is an end-to-end ELT pipeline that transforms raw physiological signal data (Sleep-EDF) into queryable sleep metrics. It replaces manual, script-based workflows with a modern, portable data stack, enabling parallelized ingestion, automated data quality checks, and flexible warehousing.
 
 **The Problem:** Clinical EEG data is typically locked in heavy binary formats (EDF), making analysis and SQL querying next to impossible.
-**The Solution:** An automated pipeline that ingests, validates, and warehouses sleep data, allowing access to insights via Snowflake and dbt.
+**The Solution:** A high-performance, parallelized pipeline that ingests, validates, and warehouses sleep data, providing immediate access to insights via DuckDB or Snowflake.
 
 ---
 
