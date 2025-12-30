@@ -1,6 +1,7 @@
 import pytest
-from pydantic import ValidationError
-from schemas import SleepEpoch
+import pandas as pd
+import pandera.pandas as pa
+from validators import SleepSchema
 
 
 def test_valid_sleep_epoch():
@@ -9,41 +10,44 @@ def test_valid_sleep_epoch():
     """
 
     data = {
-        "subject_id": 1,
-        "epoch_idx": 100,
-        "stage": "N2",
-        "delta_power": 15.5,
-        "theta_power": 14.2,
-        "alpha_power": 8.0,
-        "sigma_power": 1.2,
-        "beta_power": 2.5,
+        "subject_id": [1],
+        "epoch_idx": [100],
+        "stage": ["N2"],
+        "delta_power": [15.5],
+        "theta_power": [14.2],
+        "alpha_power": [8.0],
+        "sigma_power": [1.2],
+        "beta_power": [2.5],
     }
 
-    epoch = SleepEpoch(**data)
-    assert epoch.subject_id == 1
-    assert epoch.stage == "N2"
+    df = pd.DataFrame(data)
+    validated_df = SleepSchema.validate(df)
+    assert validated_df["subject_id"].iloc[0] == 1
+    assert validated_df["stage"].iloc[0] == "N2"
 
 
 def test_negative_power_validation():
     """
-    Ensures Pydantic schema raises a ValidationError when a negative power band is seen.
+    Ensures Pandera schema raises a SchemaError when a negative power band is seen.
     """
 
     data = {
-        "subject_id": 1,
-        "epoch_idx": 100,
-        "stage": "W",
-        "delta_power": -5,
-        "theta_power": 14.2,
-        "alpha_power": 8.0,
-        "sigma_power": 1.2,
-        "beta_power": 2.5,
+        "subject_id": [1],
+        "epoch_idx": [100],
+        "stage": ["W"],
+        "delta_power": [-5.0],
+        "theta_power": [14.2],
+        "alpha_power": [8.0],
+        "sigma_power": [1.2],
+        "beta_power": [2.5],
     }
 
-    with pytest.raises(ValidationError) as excinfo:
-        SleepEpoch(**data)
+    df = pd.DataFrame(data)
+    with pytest.raises(pa.errors.SchemaError) as excinfo:
+        SleepSchema.validate(df)
 
-    assert "Input should be greater than or equal to 0" in str(excinfo.value)
+    assert "Column 'delta_power' failed" in str(excinfo.value)
+    assert "greater_than_or_equal_to(0)" in str(excinfo.value)
 
 
 def test_invalid_stage_label():
@@ -52,15 +56,16 @@ def test_invalid_stage_label():
     """
 
     data = {
-        "subject_id": 1,
-        "epoch_idx": 100,
-        "stage": "SLEEPING",
-        "delta_power": -5,
-        "theta_power": 14.2,
-        "alpha_power": 8.0,
-        "sigma_power": 1.2,
-        "beta_power": 2.5,
+        "subject_id": [1],
+        "epoch_idx": [100],
+        "stage": ["SLEEPING"],
+        "delta_power": [15.5],
+        "theta_power": [14.2],
+        "alpha_power": [8.0],
+        "sigma_power": [1.2],
+        "beta_power": [2.5],
     }
 
-    with pytest.raises(ValidationError):
-        SleepEpoch(**data)
+    df = pd.DataFrame(data)
+    with pytest.raises(pa.errors.SchemaError):
+        SleepSchema.validate(df)

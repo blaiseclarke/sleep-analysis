@@ -1,4 +1,4 @@
-import pandera as pa
+import pandera.pandas as pa
 
 SleepSchema = pa.DataFrameSchema(
     {

@@ -1,7 +1,7 @@
 import os
 import traceback
 import pandas as pd
-import pandera as pa
+import pandera.pandas as pa
 from typing import Optional
 from dotenv import load_dotenv
 from prefect import task, flow, get_run_logger, unmapped
