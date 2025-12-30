@@ -1,6 +1,11 @@
+import logging
 import duckdb
 
 from ingest_data import DB_PATH
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def setup_database():
@@ -41,7 +46,7 @@ def setup_database():
             """
         )
 
-        print("DuckDB database setup successfully.")
+        logger.info("DuckDB database setup successfully.")
 
     finally:
         connection.close()

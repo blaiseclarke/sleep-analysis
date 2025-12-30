@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-import pandera.pandas as pa
+from pandera.errors import SchemaError
 from validators import SleepSchema
 
 
@@ -43,7 +43,7 @@ def test_negative_power_validation():
     }
 
     df = pd.DataFrame(data)
-    with pytest.raises(pa.errors.SchemaError) as excinfo:
+    with pytest.raises(SchemaError) as excinfo:
         SleepSchema.validate(df)
 
     assert "Column 'delta_power' failed" in str(excinfo.value)
@@ -67,5 +67,5 @@ def test_invalid_stage_label():
     }
 
     df = pd.DataFrame(data)
-    with pytest.raises(pa.errors.SchemaError):
+    with pytest.raises(SchemaError):
         SleepSchema.validate(df)

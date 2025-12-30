@@ -1,7 +1,6 @@
 import os
 import traceback
 import pandas as pd
-import pandera.pandas as pa
 from typing import Optional
 from dotenv import load_dotenv
 from prefect import task, flow, get_run_logger, unmapped
@@ -17,6 +16,7 @@ from ingest_data import (  # noqa: E402
 )
 from warehouse.duckdb_client import DuckDBClient  # noqa: E402
 from validators import SleepSchema  # noqa: E402
+from pandera.errors import SchemaErrors  # noqa: E402
 from prefect.task_runners import ConcurrentTaskRunner  # noqa: E402
 
 
@@ -62,7 +62,7 @@ def validate_data(
 
     try:
         return SleepSchema.validate(df, lazy=True)
-    except pa.errors.SchemaErrors as e:
+    except SchemaErrors as e:
         error_msg = f"Validation failed for subject {subject_id}: {str(e)}"
         logger.error(error_msg)
         warehouse_client.log_ingestion_error(
