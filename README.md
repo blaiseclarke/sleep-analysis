@@ -42,7 +42,7 @@ This project is an end-to-end ELT pipeline that transforms raw physiological sig
 * **🛠 Makefile Automation:** Simplified local development with a comprehensive `Makefile` for one-command installs and runs.
 * **🧪 Data Integrity Tests:** Custom dbt tests ensure logical consistency (e.g., *Band power must be positive*).
 
-<img width="986" alt="Prefect Dashboard" src="https://github.com/user-attachments/assets/71dabb27-486a-4b49-9dce-5d615d02172a" />
+<img width="986" height="497" alt="Prefect dashboard" src="https://github.com/user-attachments/assets/ed9f1351-14b1-4301-a5c0-e6c18ce97ccb" />
 
 ---
 
