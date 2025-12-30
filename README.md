@@ -1,4 +1,4 @@
-# Cloud-Native Sleep-EDF Analytics Pipeline
+# Containerized ELT Pipeline for Sleep-EDF
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
 ![DuckDB](https://img.shields.io/badge/DuckDB-OLAP-FFF000?logo=duckdb&logoColor=black)
@@ -69,7 +69,7 @@ cd sleep-edf-data-pipeline
 
 # 2. Create environment file
 # (.env file in project root)
-# Snowflake Configuration (Optional)
+# Snowflake configuration (optional)
 SNOWFLAKE_USER=your_user
 SNOWFLAKE_PASSWORD=your_password
 SNOWFLAKE_ACCOUNT=your_account_identifier
@@ -77,7 +77,7 @@ SNOWFLAKE_WAREHOUSE=COMPUTE_WH
 SNOWFLAKE_DATABASE=EEG_ANALYTICS
 SNOWFLAKE_SCHEMA=RAW
 
-# Pipeline Configuration (Optional overrides)
+# Pipeline configuration (optional overrides)
 STARTING_SUBJECT=0
 ENDING_SUBJECT=10
 RECORDING=1
@@ -108,18 +108,18 @@ cd sleep-edf-data-pipeline
 # 2. Setup and install
 make install
 
-# 3. Quick Test (Lint, Format, Test)
+# 3. Quick test (lint, format, run)
 make all
 
 # 4. Initialize local database
 make setup-db
 
-# 5. Run, lint, and Test
+# 5. Run, lint, and test
 make lint    # Check for errors
 make format  # Autoformat code
 make run     # Run parallel ingestion pipeline (persists to DuckDB)
 
-# 6. Transformations (Local DuckDB)
+# 6. Transformations (local DuckDB)
 dbt run --profiles-dir . --target dev_duckdb
 dbt test --profiles-dir . --target dev_duckdb
 ```
