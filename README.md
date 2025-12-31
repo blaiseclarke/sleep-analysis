@@ -10,10 +10,7 @@
 ![CI](https://img.shields.io/badge/GitHub_Actions-CI-2088FF?logo=github-actions&logoColor=white)
 
 ### Project Overview
-This project is an end-to-end ELT pipeline that transforms raw physiological signal data (Sleep-EDF) into queryable sleep metrics. It replaces manual, script-based workflows with a modern, portable data stack, enabling parallelized ingestion, automated data quality checks, and flexible warehousing.
-
-**The Problem:** Clinical EEG data is typically locked in heavy binary formats (EDF), making analysis and SQL querying next to impossible.
-**The Solution:** A high-performance, parallelized pipeline that ingests, validates, and warehouses sleep data, providing immediate access to insights via DuckDB or Snowflake.
+A containerized ELT pipeline that transforms raw Sleep-EDF (polysomnography) data into queryable sleep metrics. It processes the [PhysioNet Sleep-EDF Expanded](https://physionet.org/content/sleep-edfx/1.0.0/) dataset using **MNE** for signal processing, **Prefect** for orchestration, and **DuckDB** for local warehousing.
 
 ---
 
@@ -32,16 +29,14 @@ This project is an end-to-end ELT pipeline that transforms raw physiological sig
 
 ---
 
-### Engineering Highlights
+### Key Features
 
-* **🛡 Data Contracts (Pandera):** Transitioned to `pandera` for high-performance schema validation of large DataFrames.
-* **🚀 Parallel Execution:** Leveraged Prefect Mapping to process subject features concurrently with thread-safe, centralized error coordination.
-* **📦 Upfront Data Fetching:** Optimized MNE data ingestion by fetching all required subjects upfront, eliminating filesystem contention during parallel processing.
-* **💾 Local Warehousing (DuckDB):** Implemented DuckDB for fast, local persistent storage, enabling development without a Snowflake trial.
-* **✨ Fast Linting (Ruff):** Integrated `ruff` for near-instant linting and code formatting.
-* **⚡ Automated CI:** GitHub Actions triggers the `pytest` suite and `ruff` checks on every push.
-* **🛠 Makefile Automation:** Simplified local development with a comprehensive `Makefile` for one-command installs and runs.
-* **🧪 Data Integrity Tests:** Custom dbt tests ensure logical consistency (ex. *band power must be positive*).
+* **Data Validation:** Uses `pandera` for schema-level validation of signal dataframes.
+* **Parallel Ingestion:** Processes subjects concurrently using Prefect's mapping execution.
+* **Hybrid Warehousing:** Writes to local DuckDB (dev) or Snowflake (prod) using a unified `WarehouseClient` protocol.
+* **Upfront Fetching:** Pre-fetches MNE data to prevent filesystem locking during parallel extraction.
+* **Robust Observability:** Thread-safe error logging captures all extraction failures in the `INGESTION_ERRORS` table.
+* **Reproducibility:** Fully containerized with Docker; local development automated via Makefile.
 
 <img width="986" height="497" alt="Prefect dashboard" src="https://github.com/user-attachments/assets/ed9f1351-14b1-4301-a5c0-e6c18ce97ccb" />
 
