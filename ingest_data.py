@@ -24,8 +24,10 @@ def fetch_data(subjects, recording):
     Wrapper to fetch data from the designated study.
     """
     if STUDY == "telemetry":
-        return fetch_telemetry_data(subjects=subjects, recording=recording)
-    return fetch_age_data(subjects=subjects, recording=recording)
+        return fetch_telemetry_data(
+            subjects=subjects, recording=recording, on_missing="warn"
+        )
+    return fetch_age_data(subjects=subjects, recording=recording, on_missing="warn")
 
 
 # Mapping
@@ -46,6 +48,9 @@ logger = logging.getLogger(__name__)
 
 def process_subject(subject_id):
     filepaths = fetch_data(subjects=[subject_id], recording=[RECORDING])
+    if not filepaths:
+        return None
+
     psg_file = filepaths[0][0]
     hypnogram_file = filepaths[0][1]
 
