@@ -198,9 +198,6 @@ The pipeline successfully processed a batch of ~24-hour recordings from the Phys
 ---
 
 ### References
-When using this resource, please cite the original publication:
-
 * **Kemp B, Zwinderman AH, Tuk B, Kamphuisen HAC, Oberyé JJL.** *Analysis of a sleep-dependent neuronal feedback loop: the slow-wave microcontinuity of the EEG.* IEEE-BME 47(9):1185-1194 (2000).
 
-Please include the standard citation for PhysioNet:
 * **Goldberger A, Amaral L, Glass L, Hausdorff J, Ivanov PC, Mark R, ... & Stanley HE.** *PhysioBank, PhysioToolkit, and PhysioNet: Components of a new research resource for complex physiologic signals.* Circulation [Online]. 101 (23), pp. e215–e220 (2000).
