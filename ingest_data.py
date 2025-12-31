@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import mne
 from dotenv import load_dotenv
-from mne.datasets.sleep_physionet.age import fetch_data
+from mne.datasets.sleep_physionet.age import fetch_data as fetch_age_data
+from mne.datasets.sleep_physionet.temazepam import fetch_data as fetch_telemetry_data
 
 # Load environment variables
 load_dotenv()
@@ -15,6 +16,17 @@ ENDING_SUBJECT = int(os.getenv("ENDING_SUBJECT", 10))
 RECORDING = int(os.getenv("RECORDING", 1))
 EPOCH_LENGTH = float(os.getenv("EPOCH_LENGTH", 30.0))  # seconds
 DB_PATH = os.getenv("DB_PATH", "sleep_data.db")
+STUDY = os.getenv("STUDY", "age").lower()  # Options: age, telemetry
+
+
+def fetch_data(subjects, recording):
+    """
+    Wrapper to fetch data from the designated study.
+    """
+    if STUDY == "telemetry":
+        return fetch_telemetry_data(subjects=subjects, recording=recording)
+    return fetch_age_data(subjects=subjects, recording=recording)
+
 
 # Mapping
 SLEEP_STAGE_MAP = {

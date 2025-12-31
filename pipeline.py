@@ -2,14 +2,15 @@ import os
 import traceback
 import pandas as pd
 from prefect import task, flow, get_run_logger
-from mne.datasets.sleep_physionet.age import fetch_data as fetch_edf_data
 
 from ingest_data import (
     process_subject as extract_logic,
+    fetch_data,
     STARTING_SUBJECT,
     ENDING_SUBJECT,
     RECORDING,
     DB_PATH,
+    STUDY,
 )
 from warehouse.duckdb_client import DuckDBClient
 from validators import SleepSchema
@@ -112,8 +113,10 @@ def run_ingestion_pipeline():
     subject_ids = list(range(STARTING_SUBJECT, ENDING_SUBJECT + 1))
 
     # Fetch data upfront to avoid parallel download contention
-    logger.info(f"Ensuring data is available for subjects {subject_ids}")
-    fetch_edf_data(subjects=subject_ids, recording=[RECORDING])
+    logger.info(
+        f"Ensuring data is available for subjects {subject_ids} in study '{STUDY}'"
+    )
+    fetch_data(subjects=subject_ids, recording=[RECORDING])
 
     # Use mapping for parallel extraction and validation
     # Parallel tasks no longer write to the warehouse to avoid locking

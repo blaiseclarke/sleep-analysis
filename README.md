@@ -121,7 +121,7 @@ make format  # Autoformat code
 make run     # Run parallel ingestion pipeline (persists to DuckDB)
 
 # 6. Test Observability
-python simulate_error.py  # Verifies the Error Warehouse captures failures
+python simulate_error.py  # Verifies the error warehouse captures failures
 
 # 7. Transformations (local DuckDB)
 dbt run --profiles-dir . --target dev_duckdb
@@ -165,6 +165,7 @@ Built using `mne` for polysomnograph (PSG) ingestion and annotation alignment. T
     * `EPOCH_LENGTH`: Sets the window duration for EEG segmentation (default: 30s).
     * `DB_PATH`: Local path for the DuckDB database (default: `sleep_data.db`).
     * `PREFECT_MAX_WORKERS`: Limit on concurrent subject processing (default: 3).
+    * `STUDY`: Selects the Sleep-EDF study (options: `age`, `telemetry`, default: `age`).
 
 #### 2. Warehousing (DuckDB / Snowflake)
 The pipeline is warehouse-agnostic via the `WarehouseClient` protocol.
@@ -198,3 +199,13 @@ The pipeline successfully processed a batch of ~24-hour recordings from the Phys
 * Average spectral power distribution across EEG bands
 
 <img width="991" alt="Results Graph" src="https://github.com/user-attachments/assets/bdfa5260-817b-4d23-a8c6-bb4967a9d31a" />
+
+---
+
+### References
+When using this resource, please cite the original publication:
+
+* **Kemp B, Zwinderman AH, Tuk B, Kamphuisen HAC, Oberyé JJL.** *Analysis of a sleep-dependent neuronal feedback loop: the slow-wave microcontinuity of the EEG.* IEEE-BME 47(9):1185-1194 (2000).
+
+Please include the standard citation for PhysioNet:
+* **Goldberger A, Amaral L, Glass L, Hausdorff J, Ivanov PC, Mark R, ... & Stanley HE.** *PhysioBank, PhysioToolkit, and PhysioNet: Components of a new research resource for complex physiologic signals.* Circulation [Online]. 101 (23), pp. e215–e220 (2000).
