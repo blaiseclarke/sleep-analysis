@@ -22,7 +22,9 @@ def setup_database():
     connection = duckdb.connect(DB_PATH)
 
     try:
-        # Create SLEEP_EPOCHS table
+        # Create SLEEP_EPOCHS table.
+        # This is our main fact table where we store the calculated power spectral density
+        # and sleep stages for every 30-second epoch.
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS SLEEP_EPOCHS (
@@ -39,7 +41,9 @@ def setup_database():
             """
         )
 
-        # Create INGESTION_ERRORS table
+        # Create INGESTION_ERRORS table.
+        # We log any failures here so we can debug specific subject issues later
+        # without halting the entire pipeline execution.
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS INGESTION_ERRORS (

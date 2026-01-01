@@ -89,7 +89,8 @@ def process_subject(subject_id):
     annotations = mne.read_annotations(hypnogram_file)
     raw.set_annotations(annotations, emit_warning=False)
 
-    # Renaming channel names
+    # Renaming channel names to match our schema.
+    # We standardize these so downstream analysis is consistent across different machines/studies.
     mapping = {
         "EEG Fpz-Cz": "EEG",
         "EEG Pz-Oz": "EEG2",
@@ -100,6 +101,7 @@ def process_subject(subject_id):
     raw.rename_channels(map)
 
     # Building epochs
+    # We slice the continuous signal into 30-second windows (standard for sleep scoring).
     events, event_id = mne.events_from_annotations(
         raw, event_id=None, chunk_duration=EPOCH_LENGTH
     )

@@ -40,14 +40,17 @@ class SnowflakeClient(WarehouseClient):
         """
         conn = self._get_connection()
         try:
-            # 1. Clear existing data for this subject (idempotency)
-            # Snowflake connector uses %s for parameter binding
+            # 1. Clear existing data for this subject (Idempotency).
+            # This ensures if we re-run a pipeline for a subject, we don't end up with duplicate rows.
+            # (Snowflake connector uses %s for safe parameter binding).
             cursor = conn.cursor()
             cursor.execute(
                 "DELETE FROM SLEEP_EPOCHS WHERE SUBJECT_ID = %s", (subject_id,)
             )
 
-            # 2. Bulk load new data
+            # 2. Bulk load new data.
+            # write_pandas is highly optimized; it transparently uploads the DF to a temporary stage
+            # and performs a COPY INTO operation, which is much faster than INSERT statements.
             if not df.empty:
                 # Snowflake expects uppercase column names by default
                 df.columns = [c.upper() for c in df.columns]

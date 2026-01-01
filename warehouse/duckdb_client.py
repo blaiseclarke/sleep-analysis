@@ -46,9 +46,9 @@ class DuckDBClient(WarehouseClient):
                 "BETA_POWER",
             ]
 
-            # Insert new records using explicit column list
-            # We reference the 'df' variable directly in the SQL string
-            # as DuckDB can scan local pandas DataFrames.
+            # Insert new records using explicit column list.
+            # DuckDB's unique ability to query local pandas DataFrames directly ('FROM df')
+            # makes this extremely fast and avoids manual row iteration.
             query = f"""
                 INSERT INTO SLEEP_EPOCHS ({", ".join(columns)})
                 SELECT {", ".join(columns)}
