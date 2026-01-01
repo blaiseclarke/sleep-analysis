@@ -54,6 +54,28 @@ Docker Compose is recommended for reproducible, containerized execution.
 - `make` *(for automation)*
 - dbt-core (pip install dbt-snowflake or dbt-duckdb)
 
+#### Configuration
+
+**DuckDB (Default)**
+No extra configuration needed. Data is stored in `sleep_data.db`.
+
+**Snowflake**
+Set the following environment variables:
+
+```bash
+export WAREHOUSE_TYPE=snowflake
+export SNOWFLAKE_ACCOUNT=...
+export SNOWFLAKE_USER=...
+export SNOWFLAKE_PASSWORD=...
+export SNOWFLAKE_WAREHOUSE=...
+export SNOWFLAKE_DATABASE=...
+export SNOWFLAKE_SCHEMA=...
+
+# For dbt compatibility
+export DBT_SOURCE_DATABASE=$SNOWFLAKE_DATABASE
+export DBT_SOURCE_SCHEMA=$SNOWFLAKE_SCHEMA
+```
+
 #### Option 1: Docker Compose
 
 Runs the pipeline locally inside a Docker container.

@@ -12,7 +12,8 @@ from ingest_data import (
     DB_PATH,
     STUDY,
 )
-from warehouse.duckdb_client import DuckDBClient
+from warehouse.factory import get_warehouse_client
+from warehouse.base import WarehouseClient
 from validators import SleepSchema
 from pandera.errors import SchemaErrors
 from prefect.task_runners import ConcurrentTaskRunner
@@ -82,7 +83,7 @@ def process_subject_task(subject_id: int) -> dict:
 
 
 @task
-def load_to_warehouse(client: DuckDBClient, df: pd.DataFrame, subject_id: int):
+def load_to_warehouse(client: WarehouseClient, df: pd.DataFrame, subject_id: int):
     """Persists subject data to the configured warehouse."""
     logger = get_run_logger()
     logger.info(f"Loading data for subject {subject_id} to warehouse...")
@@ -98,7 +99,7 @@ def load_to_warehouse(client: DuckDBClient, df: pd.DataFrame, subject_id: int):
 def run_ingestion_pipeline():
     """Executes the ingestion pipeline using Prefect mapping for parallelization."""
     logger = get_run_logger()
-    warehouse_client = DuckDBClient(db_path=DB_PATH)
+    warehouse_client = get_warehouse_client()
 
     subject_ids = list(range(STARTING_SUBJECT, ENDING_SUBJECT + 1))
 
