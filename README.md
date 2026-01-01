@@ -10,7 +10,9 @@
 ![CI](https://img.shields.io/badge/GitHub_Actions-CI-2088FF?logo=github-actions&logoColor=white)
 
 ### Project Overview
-A containerized ELT pipeline that transforms raw Sleep-EDF (polysomnography) data into queryable sleep metrics. It processes the [PhysioNet Sleep-EDF Expanded](https://physionet.org/content/sleep-edfx/1.0.0/) dataset using **MNE** for signal processing, **Prefect** for orchestration, and **DuckDB** for local warehousing.
+This project is a production-grade ELT pipeline designed to ingest, validate, and analyze clinical sleep data. It processes the [PhysioNet Sleep-EDF Expanded](https://physionet.org/content/sleep-edfx/1.0.0/) dataset, transforming raw polysomnography (PSG) signals into queryable sleep metrics.
+
+The architecture leverages **MNE** for advanced signal processing, **Prefect** for robust orchestration, and a hybrid warehousing strategy supporting both **DuckDB** (local) and **Snowflake** (production).
 
 ---
 
@@ -56,25 +58,38 @@ Docker Compose is recommended for reproducible, containerized execution.
 
 #### Configuration
 
-**DuckDB (Default)**
-No extra configuration needed. Data is stored in `sleep_data.db`.
+**1. Create a `.env` file**
+Create a `.env` file in the project root to store your configuration. This ensures consistency between Docker and local execution.
 
-**Snowflake**
-Set the following environment variables:
+```env
+# Warehouse selection (duckdb or snowflake)
+WAREHOUSE_TYPE=snowflake
 
-```bash
-export WAREHOUSE_TYPE=snowflake
-export SNOWFLAKE_ACCOUNT=...
-export SNOWFLAKE_USER=...
-export SNOWFLAKE_PASSWORD=...
-export SNOWFLAKE_WAREHOUSE=...
-export SNOWFLAKE_DATABASE=...
-export SNOWFLAKE_SCHEMA=...
+# Snowflake credentials
+SNOWFLAKE_ACCOUNT=your_account
+SNOWFLAKE_USER=your_user
+SNOWFLAKE_PASSWORD=your_password
+SNOWFLAKE_WAREHOUSE=COMPUTE_WH
+SNOWFLAKE_DATABASE=EEG_ANALYTICS
+SNOWFLAKE_SCHEMA=RAW
 
-# For dbt compatibility
-export DBT_SOURCE_DATABASE=$SNOWFLAKE_DATABASE
-export DBT_SOURCE_SCHEMA=$SNOWFLAKE_SCHEMA
+# dbt compatibility (map to Snowflake env vars)
+DBT_SOURCE_DATABASE=EEG_ANALYTICS
+DBT_SOURCE_SCHEMA=RAW
 ```
+
+**2. Environment Loading**
+
+*   **Docker:** Automatically reads `.env`.
+*   **Python (Local):** Automatically reads `.env` (via `python-dotenv`).
+*   **dbt (Local):** dbt doesn't automatically read `.env` files. You'll need to export them to your shell environment first:
+    ```bash
+    # Export variables from .env
+    export $(grep -v '^#' .env | xargs)
+    
+    # Run dbt
+    dbt debug
+    ```
 
 #### Option 1: Docker Compose
 
@@ -101,7 +116,7 @@ ENDING_SUBJECT=10
 RECORDING=1
 EPOCH_LENGTH=30.0
 PREFECT_MAX_WORKERS=3
-DB_PATH=sleep_data.db
+DB_PATH=data/sleep_data.db
 
 # 3. Build and run pipeline
 docker compose up --build
@@ -180,13 +195,13 @@ Built using `mne` for polysomnograph (PSG) ingestion and annotation alignment. T
     * `STARTING_SUBJECT` / `ENDING_SUBJECT`: Define the participant ID range.
     * `RECORDING`: Specifies which session recording to fetch (default: 1).
     * `EPOCH_LENGTH`: Sets the window duration for EEG segmentation (default: 30s).
-    * `DB_PATH`: Local path for the DuckDB database (default: `sleep_data.db`).
+    * `DB_PATH`: Local path for the DuckDB database (default: `data/sleep_data.db`).
     * `PREFECT_MAX_WORKERS`: Limit on concurrent subject processing (default: 3).
     * `STUDY`: Selects the Sleep-EDF study (options: `age`, `telemetry`, default: `age`).
 
 #### 2. Warehousing (DuckDB / Snowflake)
 The pipeline is warehouse-agnostic via the `WarehouseClient` protocol.
-* **DuckDB (Local):** Default for local development. Data is persisted to `sleep_data.db` without cloud overhead.
+* **DuckDB (Local):** Default for local development. Data is persisted to `data/sleep_data.db` without cloud overhead.
 * **Snowflake (Cloud):** Used for production-scale storage and analytics, separating compute from storage. This allows the pipeline to scale without refactoring local memory constraints or ingestion logic.
 
 #### 3. Transformation (dbt)
