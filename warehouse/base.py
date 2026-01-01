@@ -4,11 +4,13 @@ import pandas as pd
 
 class WarehouseClient(Protocol):
     """
-    Interface for implementing warehouse-specific storage logic.
+    A blueprint that all database clients must follow.
+    This ensures our pipeline can talk to DuckDB, Snowflake, or any future database
+    using the exact same methods.
     """
 
     def load_epochs(self, df: pd.DataFrame, subject_id: int) -> None:
-        """Loads subject-level sleep epoch data to the warehouse."""
+        """Saves a batch of sleep data to the database."""
         ...
 
     def log_ingestion_error(
@@ -18,5 +20,5 @@ class WarehouseClient(Protocol):
         error_message: str,
         stack_trace: Optional[str] = None,
     ) -> None:
-        """Logs ingestion-related failures for observability."""
+        """Saves error details to a table so we can debug them later."""
         ...

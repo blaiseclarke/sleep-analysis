@@ -103,8 +103,8 @@ def run_ingestion_pipeline():
     subject_ids = list(range(STARTING_SUBJECT, ENDING_SUBJECT + 1))
 
     # Fetching data upfront is critical to avoid race conditions.
-    # If multiple workers try to download the same missing file simultaneously, 
-    # MNE's internal file locking can behave unpredictably.
+    # If multiple workers try to download the same missing file simultaneously,
+    # they might corrupt the file or crash the download.
     logger.info(
         f"Ensuring data is available for subjects {subject_ids} in study '{STUDY}'"
     )
@@ -118,7 +118,7 @@ def run_ingestion_pipeline():
 
     # Serialized loading ensures thread safety for DuckDB.
     # While DuckDB handles concurrency better than SQLite, single-threaded writes
-    # are the safest path for guarantee data integrity locally.
+    # are the safest path for guaranteed data integrity locally.
     for subject_id, result_future in zip(subject_ids, processed_results):
         try:
             result = result_future.result()
