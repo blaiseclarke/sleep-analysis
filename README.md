@@ -104,28 +104,10 @@ Runs the pipeline locally inside a Docker container.
 git clone https://github.com/blaiseclarke/sleep-edf-data-pipeline.git
 cd sleep-edf-data-pipeline
 
-# 2. Create environment file
-# (.env file in project root)
-# Snowflake configuration (optional)
-SNOWFLAKE_USER=your_user
-SNOWFLAKE_PASSWORD=your_password
-SNOWFLAKE_ACCOUNT=your_account_identifier
-SNOWFLAKE_WAREHOUSE=COMPUTE_WH
-SNOWFLAKE_DATABASE=EEG_ANALYTICS
-SNOWFLAKE_SCHEMA=RAW
-
-# Pipeline configuration (optional overrides)
-STARTING_SUBJECT=0
-ENDING_SUBJECT=10
-RECORDING=1
-EPOCH_LENGTH=30.0
-PREFECT_MAX_WORKERS=3
-DB_PATH=data/sleep_data.db
-
-# 3. Build and run pipeline
+# 2. Build and run (uses .env automatically)
 docker compose up --build
 
-# 4. Transformations
+# 3. Transformations
 # Point dbt to the local profiles.yml
 dbt deps --profiles-dir .
 dbt run --profiles-dir .
