@@ -21,7 +21,7 @@ The architecture leverages **MNE** for advanced signal processing, **Prefect** f
 
 | Stage | Tech Stack | Description |
 | :--- | :--- | :--- |
-| **Source** | **PhysioNet** | Sleep-EDF Database (Raw .edf files) |
+| **Source** | **PhysioNet** | Sleep-EDF Database (raw .edf files) |
 | **Ingestion** | **Python + MNE** | Signal processing, FFT, and feature extraction |
 | **Validation** | **Pandera** | Schema-level validation and error logging |
 | **Orchestration** | **Prefect** | Parallel mapping and flow management |
