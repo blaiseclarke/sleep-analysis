@@ -10,9 +10,9 @@
 ![CI](https://img.shields.io/badge/GitHub_Actions-CI-2088FF?logo=github-actions&logoColor=white)
 
 ### Project Overview
-This project is a production-grade ELT pipeline designed to ingest, validate, and analyze clinical sleep data. It processes the [PhysioNet Sleep-EDF Expanded](https://physionet.org/content/sleep-edfx/1.0.0/) dataset, transforming raw polysomnography (PSG) signals into queryable sleep metrics.
+This project is an ELT pipeline designed to ingest, validate, and analyze clinical sleep data. It processes the [PhysioNet Sleep-EDF Expanded](https://physionet.org/content/sleep-edfx/1.0.0/) dataset, transforming raw polysomnography (PSG) signals into queryable sleep metrics.
 
-The architecture leverages **MNE** for advanced signal processing, **Prefect** for robust orchestration, and a hybrid warehousing strategy supporting both **DuckDB** (local) and **Snowflake** (production).
+The architecture uses **MNE** for advanced signal processing, **Prefect** for orchestration, and a hybrid warehousing strategy supporting both **DuckDB** (local) and **Snowflake** (production).
 
 ---
 
@@ -44,7 +44,7 @@ Explore sleep architecture and power ratios from the Sleep-EDF age study dataset
 
 ### Key Features
 
-* **Data Validation:** Uses `pandera` for schema-level validation of signal dataframes.
+* **Data Validation:** Uses `pandera` for schema-level validation of biosignal dataframes.
 * **Parallel Ingestion:** Processes subjects concurrently using Prefect's mapping execution.
 * **Hybrid Warehousing:** Writes to local DuckDB (dev) or Snowflake (prod) using a unified `WarehouseClient` protocol.
 * **Upfront Fetching:** Pre-fetches MNE data to prevent filesystem locking during parallel extraction.
@@ -58,7 +58,7 @@ Explore sleep architecture and power ratios from the Sleep-EDF age study dataset
 ### Quick Start
 
 You can run the pipeline directly on your local machine using Python, or in a container using Docker.
-Docker Compose is recommended for reproducible, containerized execution.
+Docker Compose is recommended for reproducible execution.
 
 #### Prerequisites
 - Python 3.10+ *(for host execution)*
@@ -149,7 +149,7 @@ make lint    # Check for errors
 make format  # Autoformat code
 make run     # Run parallel ingestion pipeline (persists to DuckDB)
 
-# 6. Test Observability
+# 6. Test observability
 python simulate_error.py  # Verifies the error warehouse captures failures
 
 # 7. Transformations (local DuckDB)
@@ -189,7 +189,7 @@ Built using `mne` for polysomnograph (PSG) ingestion and annotation alignment. T
 * **Standardization:** Maps raw annotations to standardized clinical sleep stages: `W, N1, N2, N3, REM, MOVE, NAN`.
 * **Performance Optimization:** Utilizes `preload=True` to speed up FFT computations.
 * **Configurable Parameters:** The pipeline range and logic are controlled via environment variables:
-    * `STARTING_SUBJECT` / `ENDING_SUBJECT`: Define the participant ID range.
+    * `STARTING_SUBJECT` / `ENDING_SUBJECT`: Define the participant ID range (0-82 for age study, 0-21 for telemetry study).
     * `RECORDING`: Specifies which session recording to fetch (default: 1).
     * `EPOCH_LENGTH`: Sets the window duration for EEG segmentation (default: 30s).
     * `DB_PATH`: Local path for the DuckDB database (default: `data/sleep_data.db`).
