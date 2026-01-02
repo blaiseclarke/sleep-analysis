@@ -16,6 +16,17 @@ The architecture leverages **MNE** for advanced signal processing, **Prefect** f
 
 ---
 
+### Live Demo
+[Streamlit](https://sleepedf-demo.streamlit.app/)
+
+Explore sleep architecture and power ratios from the Sleep-EDF age study dataset. Queries dbt models directly from DuckDB.
+
+**Features:**
+*   **Subject Viewer**: Inspect individual recordings (Hypnogram, spectral power).
+*   **Clinical Metrics**: Total sleep time, awakenings, and sleep stage percentages.
+
+---
+
 ### Architecture
 <img width="1270" alt="Architecture Diagram" src="https://github.com/user-attachments/assets/5ecabb9a-6b37-460e-9959-8b0dbab518a9" />
 
@@ -216,16 +227,8 @@ The pipeline successfully processed the entire PhysioNet Sleep-EDF (Age Study), 
 * Frequency of nocturnal awakenings
 * Average spectral power distribution across EEG bands
 
-### Live Demo
-[Streamlit](https://sleepedf-demo.streamlit.app/)
-
-Explore sleep architecture and power ratios from the Sleep-EDF age study dataset. Queries dbt models directly from DuckDB.
-
-**Features:**
-*   **Subject Viewer**: Inspect individual recordings (Hypnogram, spectral power).
-*   **Clinical Metrics**: Total sleep time, awakenings, and sleep stage percentages.
-
 ---
+
 
 ### References
 * **Kemp B, Zwinderman AH, Tuk B, Kamphuisen HAC, Oberyé JJL.** *Analysis of a sleep-dependent neuronal feedback loop: the slow-wave microcontinuity of the EEG.* IEEE-BME 47(9):1185-1194 (2000).
