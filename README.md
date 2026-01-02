@@ -1,4 +1,4 @@
-# Containerized ELT Pipeline for Sleep-EDF
+# Containerized Biosignal ELT Pipeline (Sleep-EDF)
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
 ![DuckDB](https://img.shields.io/badge/DuckDB-OLAP-FFF000?logo=duckdb&logoColor=black)
