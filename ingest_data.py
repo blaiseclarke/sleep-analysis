@@ -214,7 +214,7 @@ def main():
             if subject is not None:
                 all_subjects.append(subject)
         except Exception as e:
-            print(f"Error processing subject {id}: {e}")
+            logger.error(f"Error processing subject {id}: {e}")
 
     if all_subjects:
         final_df = pd.concat(all_subjects, ignore_index=True)

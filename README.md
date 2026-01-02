@@ -216,8 +216,6 @@ The pipeline successfully processed the entire PhysioNet Sleep-EDF (Age Study), 
 * Frequency of nocturnal awakenings
 * Average spectral power distribution across EEG bands
 
-<img width="991" alt="Results Graph" src="https://github.com/user-attachments/assets/bdfa5260-817b-4d23-a8c6-bb4967a9d31a" />
-
 ---
 
 ### References
