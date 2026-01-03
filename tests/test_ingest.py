@@ -67,3 +67,24 @@ def test_invalid_stage_label():
     df = pd.DataFrame(data)
     with pytest.raises(SchemaError):
         SleepSchema.validate(df)
+
+
+def test_negative_values_allowed():
+    """
+    Ensures that negative values (common in dB power) are accepted by the schema.
+    """
+
+    data = {
+        "subject_id": [1],
+        "epoch_idx": [100],
+        "stage": ["N2"],
+        "delta_power": [-5.5],
+        "theta_power": [-2.0],
+        "alpha_power": [8.0],
+        "sigma_power": [1.2],
+        "beta_power": [2.5],
+    }
+
+    df = pd.DataFrame(data)
+    validated_df = SleepSchema.validate(df)
+    assert validated_df["delta_power"].iloc[0] == -5.5
