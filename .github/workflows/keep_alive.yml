@@ -1,0 +1,27 @@
+name: Keep Alive
+
+on:
+  schedule:
+    - cron: "0 */10 * * *" # Run every 10 hours (00:00, 10:00, 20:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  create-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create timestamp file
+        run: |
+          mkdir -p Assets
+          echo "$(date)" > Assets/timestamp.txt
+          cat Assets/timestamp.txt
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "Assets/timestamp.txt"
+          message: "Automated commit: Keep app alive"
+          push: true
