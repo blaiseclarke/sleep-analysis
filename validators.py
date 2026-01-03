@@ -7,7 +7,7 @@ SleepSchema = pa.DataFrameSchema(
     {
         "subject_id": pa.Column(int),
         "epoch_idx": pa.Column(int),
-        # Validate Sleep Stages
+        # Validate sleep stages
         # Enforce a strict list of allowed strings
         # Everything must be normalized to ["N1", "N2", "N3", "REM", "W"] for the dashboard
         "stage": pa.Column(
